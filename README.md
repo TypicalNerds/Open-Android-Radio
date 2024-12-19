@@ -2,7 +2,11 @@
 Open Android Radio is an experimental project intended as a internet radio client for mobile devices.
 
 # It doesn't work, can you help?
-at the moment this is a project I have started as a hobby and will not be able to provide support for.
+At the moment this is a project I have started as a hobby and may not be able to provide support in the meantime.
+
+# Will this cost me my life savings just to access?
+Absolutely not, in fact, I do not plan to charge for this app at all, just don't monetize this yourself if you ever build a fork.
+I won't be adding any trackers or advertisements either, but keep in mind that the stations you listen to can still track some aspects of your usage, such as your IP address and how long you listen.
 
 # How is this tested?
 It is being tested on both my Samsung Galaxy S24 and a Android Emulator running similar firmware as a Google Pixel.
