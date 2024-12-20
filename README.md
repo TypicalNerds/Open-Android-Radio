@@ -4,7 +4,7 @@ Open Android Radio is an experimental project intended as a internet radio clien
 # It doesn't work, can you help?
 At the moment this is a project I have started as a hobby and may not be able to provide support in the meantime.
 
-# Will this cost me my life savings just to access?
+# Will this cost me my life savings just to access it?
 Absolutely not, in fact, I do not plan to charge for this app at all, just don't monetize this yourself if you ever build a fork.
 I won't be adding any trackers or advertisements either, but keep in mind that the stations you listen to can still track some aspects of your usage, such as your IP address and how long you listen.
 
