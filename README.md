@@ -20,6 +20,7 @@ Open Android Radio is an experimental project intended as a internet radio clien
 
 # It doesn't work, can you help?
 At the moment this is a project I have started as a hobby and may not be able to provide support in the meantime.
+
 However, if you notice that the app wont play a station, check your connection or the URL you entered when you added the station, additionally, just try restarting the app by fully stopping it first.
 
 # Will this cost me my life savings just to access it?
