@@ -13,6 +13,7 @@ Open Android Radio is an experimental project intended as a internet radio clien
 - Change Station Order
 - Edit Stations
 - Recovery from errors
+- App Logo
 
 
 # It doesn't work, can you help?
