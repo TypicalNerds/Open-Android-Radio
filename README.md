@@ -1,6 +1,20 @@
 # What is Open Android Radio?
 Open Android Radio is an experimental project intended as a internet radio client for mobile devices.
 
+# Features
+- Add/Remove Radio Stations
+- Listen to Radio Stations with Ease
+- Simple Clean UI
+- No Tracking (as far as I'm aware)
+- No Images Saved to User Device, all are accessed from over the web
+ 
+# Features in development
+- Background Playback
+- Change Station Order
+- Edit Stations
+- Recovery from errors
+
+
 # It doesn't work, can you help?
 At the moment this is a project I have started as a hobby and may not be able to provide support in the meantime.
 
