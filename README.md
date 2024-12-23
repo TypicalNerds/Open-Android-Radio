@@ -17,6 +17,10 @@ Open Android Radio is an experimental project intended as a internet radio clien
 - Recovery from errors
 - App Logo
 
+# I Can't get the image for a station to load.
+As of writing, images stored on device are not supported, so for the image link you should enter in a direct link to the JPEG or PNG File.
+
+If you are trying to find UK Radio Stations, I have a [GitHub Repo](https://github.com/TypicalNerds/LakesideTV-Channel-Logos/tree/main/Radio) available, all you'd have to do is use the RAW image urls for each station.
 
 # It doesn't work, can you help?
 At the moment this is a project I have started as a hobby and may not be able to provide support in the meantime.
