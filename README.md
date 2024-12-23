@@ -7,6 +7,8 @@ Open Android Radio is an experimental project intended as a internet radio clien
 - Simple Clean UI
 - No Tracking (as far as I'm aware)
 - No Images Saved to User Device, all are accessed from over the web
+- Import & Export stations via Clipboard.
+- Pull Station Logos from the Web (Local Images not Yet Supported)
  
 # Features in development
 - Background Playback
