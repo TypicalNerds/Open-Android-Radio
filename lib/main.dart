@@ -81,7 +81,7 @@ class StationList extends StatelessWidget {
                         fit: BoxFit.contain,
                         width: 80,
                         height:50 ,
-                        semanticLabel: station['name'].toString() + " logo",
+                        semanticLabel: "${station['name']} logo",
                         errorBuilder: (context, error, stackTrace) => const Icon(
                           Icons.radio,
                           size: 40,
@@ -297,13 +297,98 @@ Widget stationNameScroll = const TextScroll("Open Android Radio");
   }
 }
 
-// Function to import default stations from the web.
-Future<void> importDefaultStationsFromWeb() async {
+void _showImportPresetsMenu(BuildContext context) async {
+  // Specify the URL for grabbing the presets
+  const presetsConfigUrl =
+      'https://raw.githubusercontent.com/TypicalNerds/OAR-Presets/refs/heads/main/preset-config.json';
+
   try {
-    // Fetch stations from the hard-coded URL
-    final response = await http.get(Uri.parse('https://raw.githubusercontent.com/TypicalNerds/OAR-Presets/refs/heads/main/default-uk.json'));
+    // Fetch the presets configuration file
+    final response = await http.get(Uri.parse(presetsConfigUrl));
 
     if (response.statusCode == 200) {
+      final List<dynamic> presetsJson = jsonDecode(response.body);
+      final List<Map<String, String>> presets = presetsJson.map((preset) {
+        return {
+          'name': preset['name'].toString(),
+          'description': preset['description'].toString(),
+          'url': preset['url'].toString(),
+        };
+      }).toList();
+
+      // Show dialog with dynamically loaded presets
+      showDialog(
+        context: context,
+        builder: (context) {
+          Map<String, String>? selectedPreset;
+          return AlertDialog(
+            title: const Text('Import Presets'),
+            content: StatefulBuilder(
+              builder: (context, setState) {
+                return SingleChildScrollView(
+                  child: DropdownButtonFormField<Map<String, String>>(
+                    decoration: const InputDecoration(labelText: 'Select a Preset'),
+                    isExpanded: true, // Ensures dropdown expands to available width
+                    items: presets
+                        .map((preset) => DropdownMenuItem<Map<String, String>>(
+                              value: preset,
+                              child: Text(
+                                preset['name'] ?? 'Unnamed Preset',
+                                overflow: TextOverflow.ellipsis, // Handle text overflow
+                              ),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedPreset = value;
+                      });
+                    },
+                  ),
+                );
+              },
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  if (selectedPreset != null) {
+                    Navigator.pop(context); // Close the dialog
+                    await _importDefaultStationsFromWeb(
+                        context, selectedPreset!['url']!);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please select a preset.')),
+                    );
+                  }
+                },
+                child: const Text('Import'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      throw Exception('Failed to fetch presets configuration. Status code: ${response.statusCode}');
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Failed to load presets configuration.")),
+    );
+  }
+}
+
+
+// Call this to initiate the import process of a station using a preset from a URL
+Future<void> _importDefaultStationsFromWeb(BuildContext context, String url) async {
+  try {
+    // Fetch stations from the selected URL
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      print("----- Response Code Passed");
       // Decode the stations from the URL response
       final decodedStations = (jsonDecode(response.body) as List<dynamic>)
           .cast<Map<String, dynamic>>();
@@ -319,19 +404,17 @@ Future<void> importDefaultStationsFromWeb() async {
       await prefs.setString('customStations', encodedStations);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Default stations imported and saved.")),
+        const SnackBar(content: Text("Preset stations imported and saved.")),
       );
     } else {
-      throw Exception('Failed to fetch default stations. Status code: ${response.statusCode}');
+      throw Exception('Failed to fetch stations. Status code: ${response.statusCode}');
     }
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Failed to import default stations.")),
+      const SnackBar(content: Text("Failed to import stations.")),
     );
   }
 }
-
-
 
 // Function to save stations
 Future<void> saveCustomStations() async {
@@ -368,14 +451,20 @@ void addCustomStation() {
               TextField(
                 controller: nameController,
                 decoration: const InputDecoration(hintText: 'Station Name'),
+                keyboardType: TextInputType.name,
+                
               ),
               TextField(
                 controller: linkController,
                 decoration: const InputDecoration(hintText: 'Stream URL'),
+                keyboardType: TextInputType.url,
+                autocorrect: false,
               ),
               TextField(
                 controller: imageUrlController,
                 decoration: const InputDecoration(hintText: 'Image URL'),
+                keyboardType: TextInputType.url,
+                autocorrect: false,
               ),
             ],
           ),
@@ -492,6 +581,7 @@ void addCustomStation() {
                 ),
               ),
             ),
+            // Button to add Custom Stations
             ListTile(
               title: const Text('Add Station'),
               leading: const Icon(Icons.add),
@@ -507,11 +597,13 @@ void addCustomStation() {
               leading: const Icon(Icons.import_export),
               onTap: importStationsFromClipboard,
             ),
+            // Option to Restore Stations from Default List
             ListTile(
-              title: const Text('UK Defaults'),
+              title: const Text('Online Preset'),
               leading: const Icon(Icons.restore),
-              onTap: importDefaultStationsFromWeb,
-            ),
+              onTap: () => _showImportPresetsMenu(context),
+              ),
+              // Opens the GitHub Repo
             ListTile(
               title: const Text('Github Repo'),
               leading: const Icon(Icons.code),
