@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Open Android Radio (Alpha)',),
+      home: const MyHomePage(title: 'Open Android Radio',),
     );
   }
 }
