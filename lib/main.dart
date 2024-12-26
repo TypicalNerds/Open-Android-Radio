@@ -161,16 +161,18 @@ class StationList extends StatelessWidget {
   }
 }
 
-// Add Edit Station Button
+// Setup the function for the edit station button
 void _showEditStationDialog(BuildContext context, Map<String, dynamic> station, int index) {
   final nameController = TextEditingController(text: station['name']);
   final linkController = TextEditingController(text: station['link']);
   final imageUrlController = TextEditingController(text: station['imageUrl']);
 
+  // show that dialogue
   showDialog(
     context: context,
     builder: (context) {
       return AlertDialog(
+        // give it a not so fancy title
         title: const Text('Edit Station'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
