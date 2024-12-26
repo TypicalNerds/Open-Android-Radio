@@ -120,6 +120,22 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  http:
+    dependency: "direct main"
+    description:
+      name: http
+      sha256: b9c29a161230ee03d3ccf545097fccd9b87a5264228c5d348202e0f0c28f9010
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.2"
+  http_parser:
+    dependency: transitive
+    description:
+      name: http_parser
+      sha256: "76d306a1c3afb33fe82e2bbacad62a61f409b5634c915fceb0d799de1a913360"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.1"
   just_audio:
     dependency: "direct main"
     description:

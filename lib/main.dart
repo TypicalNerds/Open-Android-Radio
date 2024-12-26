@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart'; // Import Shared Pr
 // ignore: unused_import 
 import 'package:url_launcher/url_launcher.dart'; // This Import is Used to Open the GitHub Repo, Don't Remove it
 import 'package:url_launcher/url_launcher_string.dart'; // This Import is Used to Open the GitHub Repo, Don't Remove it
+import 'package:http/http.dart' as http; // Import HTTP for grabbing json presets from web
 
 
 void main() {
@@ -120,6 +121,7 @@ class StationList extends StatelessWidget {
                 },
                 onLongPress: () {
                   player.stop();
+                  _showEditStationDialog(context, station, index);
                 },
               ),
             ),
@@ -159,6 +161,64 @@ class StationList extends StatelessWidget {
   }
 }
 
+// Add Edit Station Button
+void _showEditStationDialog(BuildContext context, Map<String, dynamic> station, int index) {
+    final nameController = TextEditingController(text: station['name']);
+    final linkController = TextEditingController(text: station['link']);
+    final imageUrlController = TextEditingController(text: station['imageUrl']);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Edit Station'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(hintText: 'Station Name'),
+                keyboardType: TextInputType.name,
+              ),
+              TextField(
+                controller: linkController,
+                decoration: const InputDecoration(hintText: 'Stream URL'),
+                keyboardType: TextInputType.url,
+                autocorrect: false,
+              ),
+              TextField(
+                controller: imageUrlController,
+                decoration: const InputDecoration(hintText: 'Image URL'),
+                keyboardType: TextInputType.url,
+                autocorrect: false,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context), // Close dialog
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Update the station
+                stations[index] = {
+                  'name': nameController.text,
+                  'link': linkController.text,
+                  'imageUrl': imageUrlController.text,
+                };
+                // Trigger UI update
+                (context as Element).markNeedsBuild();
+                Navigator.pop(context);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
 
 
@@ -179,7 +239,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // Initalise Just Audio
   //final player = AudioPlayer();
   final player = AudioPlayer(
-      userAgent: 'openandroidradioalphs/1.0 (Linux;Android 15)',
+      userAgent: 'openandroidradio/1.0 (Linux;Android 15)',
   useProxyForRequestHeaders: true, // default
 );
 // Create songTitles and stationName Variables
@@ -228,6 +288,41 @@ Widget stationNameScroll = const TextScroll("Open Android Radio");
     }
   }
 }
+
+// Function to import default stations from the web.
+Future<void> importDefaultStationsFromWeb() async {
+  try {
+    // Fetch stations from the hard-coded URL
+    final response = await http.get(Uri.parse('https://raw.githubusercontent.com/TypicalNerds/OAR-Presets/refs/heads/main/default-uk.json'));
+
+    if (response.statusCode == 200) {
+      // Decode the stations from the URL response
+      final decodedStations = (jsonDecode(response.body) as List<dynamic>)
+          .cast<Map<String, dynamic>>();
+
+      // Update the stations list
+      setState(() {
+        stations = decodedStations;
+      });
+
+      // Save the imported stations to shared preferences
+      final prefs = await SharedPreferences.getInstance();
+      final encodedStations = jsonEncode(stations);
+      await prefs.setString('customStations', encodedStations);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Default stations imported and saved.")),
+      );
+    } else {
+      throw Exception('Failed to fetch default stations. Status code: ${response.statusCode}');
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Failed to import default stations.")),
+    );
+  }
+}
+
 
 
 // Function to save stations
@@ -403,6 +498,11 @@ void addCustomStation() {
               title: const Text('Import Stations'),
               leading: const Icon(Icons.import_export),
               onTap: importStationsFromClipboard,
+            ),
+            ListTile(
+              title: const Text('UK Defaults'),
+              leading: const Icon(Icons.restore),
+              onTap: importDefaultStationsFromWeb,
             ),
             ListTile(
               title: const Text('Github Repo'),
