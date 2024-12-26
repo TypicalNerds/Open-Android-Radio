@@ -163,61 +163,69 @@ class StationList extends StatelessWidget {
 
 // Add Edit Station Button
 void _showEditStationDialog(BuildContext context, Map<String, dynamic> station, int index) {
-    final nameController = TextEditingController(text: station['name']);
-    final linkController = TextEditingController(text: station['link']);
-    final imageUrlController = TextEditingController(text: station['imageUrl']);
+  final nameController = TextEditingController(text: station['name']);
+  final linkController = TextEditingController(text: station['link']);
+  final imageUrlController = TextEditingController(text: station['imageUrl']);
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Edit Station'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(hintText: 'Station Name'),
-                keyboardType: TextInputType.name,
-              ),
-              TextField(
-                controller: linkController,
-                decoration: const InputDecoration(hintText: 'Stream URL'),
-                keyboardType: TextInputType.url,
-                autocorrect: false,
-              ),
-              TextField(
-                controller: imageUrlController,
-                decoration: const InputDecoration(hintText: 'Image URL'),
-                keyboardType: TextInputType.url,
-                autocorrect: false,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context), // Close dialog
-              child: const Text('Cancel'),
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Edit Station'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(hintText: 'Station Name'),
+              keyboardType: TextInputType.name,
             ),
-            TextButton(
-              onPressed: () {
-                // Update the station
-                stations[index] = {
-                  'name': nameController.text,
-                  'link': linkController.text,
-                  'imageUrl': imageUrlController.text,
-                };
-                // Trigger UI update
-                (context as Element).markNeedsBuild();
-                Navigator.pop(context);
-              },
-              child: const Text('Save'),
+            TextField(
+              controller: linkController,
+              decoration: const InputDecoration(hintText: 'Stream URL'),
+              keyboardType: TextInputType.url,
+              autocorrect: false,
+            ),
+            TextField(
+              controller: imageUrlController,
+              decoration: const InputDecoration(hintText: 'Image URL'),
+              keyboardType: TextInputType.url,
+              autocorrect: false,
             ),
           ],
-        );
-      },
-    );
-  }
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context), // Close dialog
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              // Update the station in the list
+              stations[index] = {
+                'name': nameController.text,
+                'link': linkController.text,
+                'imageUrl': imageUrlController.text,
+              };
+
+              // Save the updated list to SharedPreferences
+              final prefs = await SharedPreferences.getInstance();
+              final encodedStations = jsonEncode(stations);
+              await prefs.setString('customStations', encodedStations);
+
+              // Trigger UI update and close dialog
+              Navigator.pop(context);
+              (context as Element).markNeedsBuild(); // Refresh the widget tree
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
 
 
 
