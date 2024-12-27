@@ -19,14 +19,12 @@ Open Android Radio is an experimental project intended as a internet radio clien
 
 # FAQ
 ## Are Stations Included?
-As of Writing, a limited number of Major UK Radio Stations are available at a single press of a button, these can then be edited to match your local area or you can choose to stick with the national uk feeds.
+As of Writing, no stations are included with the presets until I have gotten permission from radio station operators as they own the trademarks and copyrights for logos and names, requiring me to obtain their permission first, at the moment I am working on gathering permission from some large media organisations to get permission to include major UK Radio stations as standard but I cannot gaurentee anything at this time.
 
 For More Info, view the ReadMe over on the [OAR-Presets Repo](https://github.com/TypicalNerds/OAR-Presets).
 
 ## I Can't get the image for a station to load.
 As of writing, images stored on device are not supported, so for the image link you should enter in a direct link to the JPEG or PNG File.
-
-If you are trying to find UK Radio Stations, I have a [GitHub Repo](https://github.com/TypicalNerds/LakesideTV-Channel-Logos/tree/main/Radio) available, all you'd have to do is use the RAW image urls for each station.
 
 ## It doesn't work, can you help?
 At the moment this is a project I have started as a hobby and may not be able to provide support in the meantime.
