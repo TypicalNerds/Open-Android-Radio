@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Used to Access the Clipboard to import/export stations
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart'; // Import service to enable background playback
 import 'package:text_scroll/text_scroll.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import Shared Preferences library to allow saving of stations
 // ignore: unused_import 
@@ -10,8 +11,15 @@ import 'package:url_launcher/url_launcher.dart'; // This Import is Used to Open 
 import 'package:url_launcher/url_launcher_string.dart'; // This Import is Used to Open the GitHub Repo, Don't Remove it
 import 'package:http/http.dart' as http; // Import HTTP for grabbing json presets from web
 
-
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter bindings are initialized
+  print("Initializing JustAudioBackground...");
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'com.typicalnerds.open_android_radio.channel.audio',
+    androidNotificationChannelName: 'Audio playback',
+    androidNotificationOngoing: true,
+  );
+  print("Initialized JustAudioBackground...");
   runApp(const MyApp());
 }
 
@@ -46,9 +54,7 @@ class StationList extends StatelessWidget {
   final AudioPlayer player;
   final Function(int, BuildContext) removeStation;
   
-
   const StationList({super.key, required this.stations, required this.player, required this.removeStation,});
-
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -109,18 +115,36 @@ class StationList extends StatelessWidget {
                 minLeadingWidth: 80,
                 minVerticalPadding: 8,
                 minTileHeight: 50,
-                onTap: () {
+                onTap: () async {
+                  // Try to change the audio source and play the newly selected station
                   try {
-                    AudioSource source = AudioSource.uri(Uri.parse(station['link']));
+                    if (player.playerState.playing == true) {
+                      await player.stop();
+                    }
+                    
+                    Future.delayed(Durations.medium2, () {
+                      AudioSource source = AudioSource.uri(
+                      Uri.parse(
+                        station['link']
+                        ),
+                        tag: MediaItem(
+                          id: "",
+                          title: station['name'],
+                          album: "Open Android Radio",
+                          artUri: Uri.parse(station['imageUrl']),
+                          isLive: true,
+                          ),
+                        );
                     player.setAudioSource(source);
                     player.play();
                     player.setLoopMode(LoopMode.one);
+                    },);
+
                   } on PlayerException catch (e) {
                     print("Error Playing Station: $e");
                   }
                 },
                 onLongPress: () {
-                  player.stop();
                   _showEditStationDialog(context, station, index);
                 },
               ),
@@ -576,7 +600,7 @@ void addCustomStation() {
                 color: Colors.blue,
               ),
               child: Text(
-                'Open Android Radio \n(Beta Build)',
+                'Open Android Radio \n(v0.0.4-beta)',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
