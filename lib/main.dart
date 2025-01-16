@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Used to Access the Clipboard to import/export stations
@@ -13,13 +12,11 @@ import 'package:http/http.dart' as http; // Import HTTP for grabbing json preset
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter bindings are initialized
-  print("Initializing JustAudioBackground...");
   await JustAudioBackground.init(
     androidNotificationChannelId: 'com.typicalnerds.open_android_radio.channel.audio',
     androidNotificationChannelName: 'Audio playback',
     androidNotificationOngoing: true,
   );
-  print("Initialized JustAudioBackground...");
   runApp(const MyApp());
 }
 
@@ -37,6 +34,7 @@ class MyApp extends StatelessWidget {
           titleMedium: TextStyle(color: Colors.white),
           titleSmall: TextStyle(color: Colors.white),
         ),
+        
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'Open Android Radio',),
@@ -45,7 +43,7 @@ class MyApp extends StatelessWidget {
 }
 
 // Define All Default Radio Staions Here
-// I'll admit, I didn't remember how to add these lists, so I used Google Gemini to create a sample template and went from there.
+// I'll admit, I didn't remember how to add these lists, so I used AI to create a sample template and went from there.
 // Stations should have a URL for the stream and Logo as well as a Name to avoid issues.
 List<Map<String, dynamic>> stations = [];
 
@@ -54,6 +52,7 @@ class StationList extends StatelessWidget {
   final AudioPlayer player;
   final Function(int, BuildContext) removeStation;
   
+  // Create List of Stations
   const StationList({super.key, required this.stations, required this.player, required this.removeStation,});
   @override
   Widget build(BuildContext context) {
@@ -67,6 +66,7 @@ class StationList extends StatelessWidget {
             Dismissible(
               key: Key(station['name']),
               background: Container(color: Colors.red),
+              direction: DismissDirection.none,
               confirmDismiss: (direction) async {
             // Show a confirmation dialog before dismissing the item
             bool? confirmed = await _showConfirmationDialog(context);
@@ -75,6 +75,7 @@ class StationList extends StatelessWidget {
               onDismissed: (direction) {
                 removeStation(index, context); // Confirmation dialog for dismissal
               },
+              // Define whats shown on each station's tile.
               child: ListTile(
                 enabled: true,
                 contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 1.25),
@@ -108,7 +109,7 @@ class StationList extends StatelessWidget {
               fadeBorderSide: FadeBorderSide.both,
               textAlign: TextAlign.left,
               pauseBetween: Duration(seconds: 3),
-              intervalSpaces: 15,
+              intervalSpaces: 12,
             
                 ),
                 tileColor: Colors.black87,
@@ -121,7 +122,7 @@ class StationList extends StatelessWidget {
                     if (player.playerState.playing == true) {
                       await player.stop();
                     }
-                    
+                    // For some reason the stop command would sometimes get executed after stopping a station, hardcode a delay here to ensure it goes in the right order.
                     Future.delayed(Durations.medium2, () {
                       AudioSource source = AudioSource.uri(
                       Uri.parse(
@@ -142,11 +143,40 @@ class StationList extends StatelessWidget {
 
                   } on PlayerException catch (e) {
                     print("Error Playing Station: $e");
+
                   }
                 },
-                onLongPress: () {
-                  _showEditStationDialog(context, station, index);
-                },
+
+                // Add Icon to Open Submenu (Edit/Remove Options)
+                trailing: IconButton(
+                  padding: EdgeInsets.symmetric(horizontal: 0),
+                  onPressed: () {
+                    // Open the Drop Down when pressed
+                    _stationDropdown(context, station, index);
+                  },
+
+                  // Define the icon
+                  icon: Container(
+                    // Give it a bit of colour
+                  decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [
+                    Colors.pink,
+                    Colors.deepPurple,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  ),
+                ),
+                // Choose the actual Icon
+                  child: Icon(
+                    Icons.more_vert,
+                    color: Colors.white,
+                    semanticLabel: "More Options",
+                  ),
+                  )
+                  ),
               ),
             ),
             Divider(
@@ -159,6 +189,48 @@ class StationList extends StatelessWidget {
       },
     );
   }
+
+  // Menu to be shown to give user options to either remove a station or edit it
+void _stationDropdown(BuildContext context, Map<String, dynamic> station, int index) {
+  showAdaptiveDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text("Station Options"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Edit Station
+            ListTile(
+              leading: Icon(Icons.edit),
+              title: Text("Edit Station"),
+              onTap: () {
+                Navigator.pop(context);
+                _showEditStationDialog(context, station, index);
+              }
+            ),
+            // Remove Prompt
+            ListTile(
+              leading: Icon(Icons.delete),
+              title: Text("Remove Station"),
+              onTap: () {
+                Navigator.pop(context);
+                removeStation(index, context);
+              } 
+              
+            ),
+            // Close Menu
+            ListTile(
+              leading: Icon(Icons.close),
+              title: Text("Close Menu"),
+              onTap: () => Navigator.pop(context),
+            ),
+          ],
+        ) 
+
+      );
+    },);
+}
   // This method shows a confirmation dialog
   Future<bool?> _showConfirmationDialog(BuildContext context) {
     return showDialog<bool>(
@@ -185,13 +257,13 @@ class StationList extends StatelessWidget {
   }
 }
 
+
 // Setup the function for the edit station button
 void _showEditStationDialog(BuildContext context, Map<String, dynamic> station, int index) {
   final nameController = TextEditingController(text: station['name']);
   final linkController = TextEditingController(text: station['link']);
   final imageUrlController = TextEditingController(text: station['imageUrl']);
-
-  // show that dialogue
+  // show that edit menu dialogue
   showDialog(
     context: context,
     builder: (context) {
@@ -208,13 +280,13 @@ void _showEditStationDialog(BuildContext context, Map<String, dynamic> station, 
             ),
             TextField(
               controller: linkController,
-              decoration: const InputDecoration(hintText: 'Stream URL'),
+              decoration: const InputDecoration(hintText: 'Stream URL*'),
               keyboardType: TextInputType.url,
               autocorrect: false,
             ),
             TextField(
               controller: imageUrlController,
-              decoration: const InputDecoration(hintText: 'Image URL'),
+              decoration: const InputDecoration(hintText: 'Image URL*'),
               keyboardType: TextInputType.url,
               autocorrect: false,
             ),
@@ -282,6 +354,11 @@ String? stationName = "";
 // Create placeholder widgets to initialise TextScroll variables
 Widget songTitleScroll = const TextScroll("Nothing is Playing Right Now");
 Widget stationNameScroll = const TextScroll("Open Android Radio");
+Widget floatingStopButton = FloatingActionButton(
+  onPressed: () => print("it kept complaining about using null here so here you go you fucking dumbass compiler"),
+  child: Icon(Icons.stop, semanticLabel: "Stop Playback",),
+  tooltip: "Stop Playback",
+  );
 
 // Export stations to clipboard
   Future<void> exportStationsToClipboard() async {
@@ -519,21 +596,62 @@ void addCustomStation() {
     );
   }
 
+// TODO - Add Confirmation
   // Confirmation dialog to remove a station
   void removeStation(int index, BuildContext context) {
     setState(() {
-                  stations.removeAt(index); // CHANGED: Dynamically remove the station and trigger UI update
+                  stations.removeAt(index); // Dynamically remove the station and trigger UI update
                   saveCustomStations(); // Save updated stations
                 });
   }
-
-
-
 
   @override
   void initState() {
     super.initState();
     loadCustomStations();
+    
+    // Listen for when there is media playing or not
+    player.playerStateStream.listen(
+      (PlayerState) {
+          if (PlayerState.playing == true || PlayerState.processingState == ProcessingState.buffering || PlayerState.processingState == ProcessingState.loading) {
+            // If nothing is playing, remove the stop button
+            print("-----PASS" + PlayerState.processingState.toString());
+            setState(() {
+              floatingStopButton = Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+
+                  gradient: LinearGradient(
+                    colors: [
+                    Colors.pink,
+                    Colors.deepPurple,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.topRight,
+                  ),
+                ),
+                child: FloatingActionButton(
+                  backgroundColor: Colors.transparent,
+                  onPressed: () => player.stop(),
+                  child: Icon(Icons.stop, semanticLabel: "Stop",),
+                  ),
+              );
+              
+
+            });
+            
+           } else {
+            // If Something is Playing, Enable the Stop Button
+            setState(() {
+              floatingStopButton = Container();
+            });
+            
+            
+           }
+        
+      },
+
+    );
 
     player.icyMetadataStream.listen((metadata) {
       setState(() {
@@ -579,7 +697,18 @@ void addCustomStation() {
     return Scaffold(
       // That goofy ahh bar at the top of the screen
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        // App Bar Gradient (makes that shit look a little bit nicer)
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+                  colors: [Colors.deepPurple, Colors.blue, ],
+                  transform: GradientRotation(1),
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  ),
+          ),
+        ),
+        // Title of the App
         title: Text(widget.title),
         titleTextStyle: const TextStyle(
           color: Colors.white,
@@ -597,10 +726,14 @@ void addCustomStation() {
           children: [
             const DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.blue,
+                gradient: LinearGradient(
+                  colors: [Colors.blue, Colors.deepPurple,],
+                  begin: Alignment.bottomLeft,
+                  end: Alignment.topRight,
+                  ),
               ),
               child: Text(
-                'Open Android Radio \n(v0.0.4-beta)',
+                'Open Android Radio \n(v0.0.5-beta)',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
@@ -631,9 +764,21 @@ void addCustomStation() {
               ),
               // Opens the GitHub Repo
             ListTile(
-              title: const Text('Github Repo'),
+              title: const Text('GitHub Repo'),
               leading: const Icon(Icons.code),
               onTap: () => launchUrlString("https://github.com/TypicalNerds/Open-Android-Radio"),
+            ),
+            // TODO - Add a ToS To avoid getting sued by some dumbass
+            ListTile(
+              title: const Text('Terms of Use'),
+              leading: const Icon(Icons.info),
+              onTap: () => launchUrlString("https://github.com/TypicalNerds/Open-Android-Radio/blob/main/ToS.md"),
+            ),
+            // TODO - Make Tutorials, Upload to YouTube Playlist and Link to it here
+            ListTile(
+              title: const Text('Help'),
+              leading: const Icon(Icons.help_center),
+              onTap: () => launchUrlString("https://youtube.com/playlist?list=PLFetoIJeQKyodXVrshz4SW8xuAvlEddf6"),
             ),
           ],
         ),
@@ -641,8 +786,9 @@ void addCustomStation() {
 
       bottomNavigationBar: BottomAppBar(
         child: Container(
-          height: 50,
-          padding: const EdgeInsets.symmetric(horizontal: 0),
+          height: kBottomNavigationBarHeight,
+          
+          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -657,18 +803,12 @@ void addCustomStation() {
                   ],
                 ),
         ),
-
-        IconButton(
-          icon: const Icon(Icons.stop),
-          onPressed: () {
-            player.stop();
-          },
-        ),
       ],
     ),
   ),
 ),
-
+floatingActionButton: floatingStopButton,
+floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,
     );
   }
 }
