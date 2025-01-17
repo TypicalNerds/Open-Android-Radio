@@ -16,6 +16,11 @@ Open Android Radio is an experimental project intended as a internet radio clien
 - Change Station Order
 - Recovery from errors
 
+# Roadmap
+- Localisation (Multi-Language Support)
+- Station Favourites
+- Categories/Genres
+
 # FAQ
 ## Are Stations Included?
 As of Writing, no stations are included with the presets until I have gotten permission from radio station operators as they own the trademarks and copyrights for logos and names, requiring me to obtain their permission first, at the moment I am working on gathering permission from some large media organisations to get permission to include major UK Radio stations as standard but I cannot gaurentee anything at this time.
@@ -29,6 +34,9 @@ As of writing, images stored on device are not supported, so for the image link 
 At the moment this is a project I have started as a hobby and may not be able to provide support in the meantime.
 
 However, if you notice that the app wont play a station, check your connection or the URL you entered when you added the station, additionally, just try restarting the app by fully stopping it first.
+
+## Play Store/Alt Store release when?
+I am in the process of getting the app through the closed testing phase for the Google Play Store, as for other stores, I'd be happy for any other alt store such as F-Droid to re-distribute it as long as they don't make any major modifications or remove the links/credits to this GitHub, after all, it is open for everyone to use it.
 
 ## Will this cost me my life savings just to access it?
 Absolutely not, in fact, I do not plan to charge for this app at all, just don't monetize this yourself if you ever build a fork.
