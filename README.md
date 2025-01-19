@@ -12,14 +12,13 @@ Open Android Radio is an experimental project intended as a internet radio clien
 - Import & Export stations via Clipboard.
 - Pull Station Logos from the Web (Local Images not Yet Supported)
  
-# Features in development
-- Change Station Order
-- Recovery from errors
-
-# Roadmap
-- Localisation (Multi-Language Support)
-- Station Favourites
+# Planned Features
 - Categories/Genres
+- Change Station Order
+- Localisation (Multi-Language Support)
+- Recovery from errors
+- Station Favourites
+
 
 # FAQ
 ## Are Stations Included?
