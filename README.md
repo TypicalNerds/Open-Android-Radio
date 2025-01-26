@@ -12,9 +12,13 @@ Open Android Radio is an experimental project intended as a internet radio clien
 - Import & Export stations via Clipboard.
 - Pull Station Logos from the Web (Local Images not Yet Supported)
  
-# Features in development
+# Planned Features
+- Categories/Genres
 - Change Station Order
+- Localisation (Multi-Language Support)
 - Recovery from errors
+- Station Favourites
+
 
 # FAQ
 ## Are Stations Included?
@@ -29,6 +33,9 @@ As of writing, images stored on device are not supported, so for the image link 
 At the moment this is a project I have started as a hobby and may not be able to provide support in the meantime.
 
 However, if you notice that the app wont play a station, check your connection or the URL you entered when you added the station, additionally, just try restarting the app by fully stopping it first.
+
+## Play Store/Alt Store release when?
+I am in the process of getting the app through the closed testing phase for the Google Play Store, as for other stores, I'd be happy for any other alt store such as F-Droid to re-distribute it as long as they don't make any major modifications or remove the links/credits to this GitHub, after all, it is open for everyone to use it.
 
 ## Will this cost me my life savings just to access it?
 Absolutely not, in fact, I do not plan to charge for this app at all, just don't monetize this yourself if you ever build a fork.
