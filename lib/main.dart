@@ -142,7 +142,11 @@ class StationList extends StatelessWidget {
                     },);
 
                   } on PlayerException catch (e) {
-                    print("Error Playing Station: $e");
+                    // If an error occurs, copy it to clipboard and display an error message.
+                    await Clipboard.setData(ClipboardData(text: "Error Log: $e"));  // Using built-in Clipboard functionality
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Error Occured: Copied to Clipboard")),
+                      );
 
                   }
                 },
@@ -207,9 +211,11 @@ void _stationDropdown(BuildContext context, Map<String, dynamic> station, int in
               onTap: () {
                 Navigator.pop(context);
                 _showEditStationDialog(context, station, index);
+                // TODO - RELOAD ON EDIT
+                
               }
             ),
-            // Remove Prompt
+            // Remove Button
             ListTile(
               leading: Icon(Icons.delete),
               title: Text("Remove Station"),
@@ -231,7 +237,9 @@ void _stationDropdown(BuildContext context, Map<String, dynamic> station, int in
       );
     },);
 }
+
   // This method shows a confirmation dialog
+  // TODO - Add to Remove Station Code to Give Confirmation
   Future<bool?> _showConfirmationDialog(BuildContext context) {
     return showDialog<bool>(
       context: context,
@@ -257,75 +265,146 @@ void _stationDropdown(BuildContext context, Map<String, dynamic> station, int in
   }
 }
 
-
-// Setup the function for the edit station button
 void _showEditStationDialog(BuildContext context, Map<String, dynamic> station, int index) {
   final nameController = TextEditingController(text: station['name']);
   final linkController = TextEditingController(text: station['link']);
   final imageUrlController = TextEditingController(text: station['imageUrl']);
-  // show that edit menu dialogue
+
+  // FocusNodes to manage focus between fields
+  final nameFocusNode = FocusNode();
+  final linkFocusNode = FocusNode();
+  final imageUrlFocusNode = FocusNode();
+
+  // Variables to track validation state and error messages
+  bool isNameValid = true;
+  bool isLinkValid = true;
+  bool isImageUrlValid = true;
+
+  // Show the edit station dialog
   showDialog(
     context: context,
     builder: (context) {
-      return AlertDialog(
-        // give it a not so fancy title
-        title: const Text('Edit Station'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(hintText: 'Station Name'),
-              keyboardType: TextInputType.name,
-            ),
-            TextField(
-              controller: linkController,
-              decoration: const InputDecoration(hintText: 'Stream URL*'),
-              keyboardType: TextInputType.url,
-              autocorrect: false,
-            ),
-            TextField(
-              controller: imageUrlController,
-              decoration: const InputDecoration(hintText: 'Image URL*'),
-              keyboardType: TextInputType.url,
-              autocorrect: false,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context), // Close dialog
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              // Update the station in the list
-              stations[index] = {
-                'name': nameController.text,
-                'link': linkController.text,
-                'imageUrl': imageUrlController.text,
-              };
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: const Text('Edit Station'),
+            content: SingleChildScrollView( // Make the content scrollable
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: nameController,
+                    focusNode: nameFocusNode,
+                    decoration: InputDecoration(
+                      hintText: 'Station Name*',
+                      errorText: isNameValid ? null : 'This field is required',
+                    ),
+                    keyboardType: TextInputType.name,
+                    textInputAction: TextInputAction.next, // Move to next field when Enter is pressed
+                    onEditingComplete: () {
+                      // Move focus to the next field
+                      FocusScope.of(context).requestFocus(linkFocusNode);
+                    },
+                  ),
+                  SizedBox(height: 8),
+                  TextField(
+                    controller: linkController,
+                    focusNode: linkFocusNode,
+                    decoration: InputDecoration(
+                      hintText: 'Stream URL*',
+                      errorText: isLinkValid ? null : 'This field is required',
+                    ),
+                    keyboardType: TextInputType.url,
+                    autocorrect: false,
+                    textInputAction: TextInputAction.next, // Move to next field when Enter is pressed
+                    onEditingComplete: () {
+                      // Move focus to the next field
+                      FocusScope.of(context).requestFocus(imageUrlFocusNode);
+                    },
+                  ),
+                  SizedBox(height: 8),
+                  TextField(
+                    controller: imageUrlController,
+                    focusNode: imageUrlFocusNode,
+                    decoration: InputDecoration(
+                      hintText: 'Image URL*',
+                      errorText: isImageUrlValid ? null : 'This field is required',
+                    ),
+                    keyboardType: TextInputType.url,
+                    autocorrect: false,
+                    textInputAction: TextInputAction.done, // "Done" action to complete the form
+                    onEditingComplete: () {
+                      // Trigger the Save button's action (or any other form submission action)
+                      setState(() {
+                        // Validation logic on form submission
+                        isNameValid = nameController.text.isNotEmpty;
+                        isLinkValid = linkController.text.isNotEmpty;
+                        isImageUrlValid = imageUrlController.text.isNotEmpty;
+                      });
 
-              // Save the updated list to SharedPreferences
-              final prefs = await SharedPreferences.getInstance();
-              final encodedStations = jsonEncode(stations);
-              await prefs.setString('customStations', encodedStations);
+                      // Only proceed if all fields are valid
+                      if (isNameValid && isLinkValid && isImageUrlValid) {
+                        // Update the station in the list
+                        stations[index] = {
+                          'name': nameController.text,
+                          'link': linkController.text,
+                          'imageUrl': imageUrlController.text,
+                        };
 
-              // Trigger UI update and close dialog
-              Navigator.pop(context);
-              (context as Element).markNeedsBuild(); // Refresh the widget tree
-            },
-            child: const Text('Save'),
-          ),
-        ],
+                        // Save the updated list to SharedPreferences
+                        SharedPreferences.getInstance().then((prefs) {
+                          final encodedStations = jsonEncode(stations);
+                          prefs.setString('customStations', encodedStations);
+                          // Trigger a rebuild by calling setState in the parent widget
+                          Navigator.pop(context); // Close the dialog
+                        });
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context), // Close dialog without action
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  // Validate and submit the form when the Save button is pressed
+                  setState(() {
+                    isNameValid = nameController.text.isNotEmpty;
+                    isLinkValid = linkController.text.isNotEmpty;
+                    isImageUrlValid = imageUrlController.text.isNotEmpty;
+                  });
+
+                  // Only proceed if all fields are valid
+                  if (isNameValid && isLinkValid && isImageUrlValid) {
+                    // Update the station in the list
+                    stations[index] = {
+                      'name': nameController.text,
+                      'link': linkController.text,
+                      'imageUrl': imageUrlController.text,
+                    };
+
+                    // Save the updated list to SharedPreferences
+                    SharedPreferences.getInstance().then((prefs) {
+                      final encodedStations = jsonEncode(stations);
+                      prefs.setString('customStations', encodedStations);
+                      // Trigger a rebuild by calling setState in the parent widget
+                      Navigator.pop(context); // Close the dialog
+                    });
+                  }
+                },
+                child: const Text('Save'),
+              ),
+            ],
+          );
+        },
       );
     },
   );
 }
-
-
-
-
 
 
 
@@ -359,6 +438,48 @@ Widget floatingStopButton = FloatingActionButton(
   child: Icon(Icons.stop, semanticLabel: "Stop Playback",),
   tooltip: "Stop Playback",
   );
+
+// Menu to be shown to give user options to either remove a station or edit it
+void _importTypeSelection(BuildContext context, List<Map<String, dynamic>> stations) async {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text("Import Options"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Import from Device Clipboard
+            ListTile(
+              leading: Icon(Icons.paste),
+              title: Text("From Clipboard"),
+              onTap: () {
+                importStationsFromClipboard();
+                Navigator.pop(context);
+              }
+            ),
+            // Remove Prompt
+            ListTile(
+              leading: Icon(Icons.code),
+              title: Text("From OAR GitHub"),
+              onTap: () {
+                Navigator.of(context).pop();
+                _showGitHubImportPresetsMenu();
+              },
+              
+            ),
+            // Close Menu
+            ListTile(
+              leading: Icon(Icons.close),
+              title: Text("Close Menu"),
+              onTap: () => Navigator.pop(context),
+            ),
+          ],
+        ) 
+
+      );
+    },);
+}
 
 // Export stations to clipboard
   Future<void> exportStationsToClipboard() async {
@@ -400,7 +521,9 @@ Widget floatingStopButton = FloatingActionButton(
   }
 }
 
-void _showImportPresetsMenu(BuildContext context) async {
+// Selection for Importing Web Presets from OAR-Presets GitHub
+// GitHub Repo Available Here: https://github.com/TypicalNerds/OAR-Presets/
+void _showGitHubImportPresetsMenu() async {
   // Specify the URL for grabbing the presets
   const presetsConfigUrl =
       'https://raw.githubusercontent.com/TypicalNerds/OAR-Presets/refs/heads/main/preset-config.json';
@@ -452,13 +575,13 @@ void _showImportPresetsMenu(BuildContext context) async {
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.of(context).pop(),
                 child: const Text('Cancel'),
               ),
               TextButton(
                 onPressed: () async {
                   if (selectedPreset != null) {
-                    Navigator.pop(context); // Close the dialog
+                    Navigator.of(context).pop(); // Close the dialog
                     await _importDefaultStationsFromWeb(
                         context, selectedPreset!['url']!);
                   } else {
@@ -524,6 +647,7 @@ Future<void> saveCustomStations() async {
     final prefs = await SharedPreferences.getInstance();
     final encodedStations = jsonEncode(stations);
     await prefs.setString('customStations', encodedStations);
+    loadCustomStations();
   }
 
 // Function used to load saved stations
@@ -538,63 +662,133 @@ Future<void> loadCustomStations() async {
     }
   }
 
+// Prompt user to enter values for custom station.
 void addCustomStation() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        final nameController = TextEditingController();
-        final linkController = TextEditingController();
-        final imageUrlController = TextEditingController();
+  showDialog(
+    context: context,
+    barrierDismissible: false, // Prevent dismissing the dialog by tapping outside
+    builder: (context) {
+      final nameController = TextEditingController();
+      final linkController = TextEditingController();
+      final imageUrlController = TextEditingController();
 
-        return AlertDialog(
-          title: const Text('Add Station'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(hintText: 'Station Name'),
-                keyboardType: TextInputType.name,
-                
+      // FocusNodes to manage the focus between fields
+      final nameFocusNode = FocusNode();
+      final linkFocusNode = FocusNode();
+      final imageUrlFocusNode = FocusNode();
+
+      // Variables to track validation state and error messages
+      bool isNameValid = true;
+      bool isLinkValid = true;
+      bool isImageUrlValid = true;
+
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: const Text('Add Station'),
+            content: SingleChildScrollView( // Make the content scrollable
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: nameController,
+                    focusNode: nameFocusNode,
+                    decoration: InputDecoration(
+                      hintText: 'Station Name',
+                      errorText: isNameValid ? null : 'This field is required',
+                    ),
+                    keyboardType: TextInputType.name,
+                    textInputAction: TextInputAction.next, // Move to next field when Enter is pressed
+                    onEditingComplete: () {
+                      // Move focus to the next field
+                      FocusScope.of(context).requestFocus(linkFocusNode);
+                    },
+                  ),
+                  SizedBox(height: 8),
+                  TextField(
+                    controller: linkController,
+                    focusNode: linkFocusNode,
+                    decoration: InputDecoration(
+                      hintText: 'Stream URL',
+                      errorText: isLinkValid ? null : 'This field is required',
+                    ),
+                    keyboardType: TextInputType.url,
+                    autocorrect: false,
+                    textInputAction: TextInputAction.next, // Move to next field when Enter is pressed
+                    onEditingComplete: () {
+                      // Move focus to the next field
+                      FocusScope.of(context).requestFocus(imageUrlFocusNode);
+                    },
+                  ),
+                  SizedBox(height: 8),
+                  TextField(
+                    controller: imageUrlController,
+                    focusNode: imageUrlFocusNode,
+                    decoration: InputDecoration(
+                      hintText: 'Image URL',
+                      errorText: isImageUrlValid ? null : 'This field is required',
+                    ),
+                    keyboardType: TextInputType.url,
+                    autocorrect: false,
+                    textInputAction: TextInputAction.done, // "Done" action to complete the form
+                    onEditingComplete: () {
+                      // Trigger the Add button's action (or any other form submission action)
+                      setState(() {
+                        // Validation logic on form submission
+                        isNameValid = nameController.text.isNotEmpty;
+                        isLinkValid = linkController.text.isNotEmpty;
+                        isImageUrlValid = imageUrlController.text.isNotEmpty;
+                      });
+
+                      // Only proceed if all fields are valid
+                      if (isNameValid && isLinkValid && isImageUrlValid) {
+                        stations.add({
+                          'name': nameController.text,
+                          'link': linkController.text,
+                          'imageUrl': imageUrlController.text,
+                        });
+                        saveCustomStations(); // Save updated stations
+                        Navigator.pop(context); // Close dialog after adding the station
+                      }
+                    },
+                  ),
+                ],
               ),
-              TextField(
-                controller: linkController,
-                decoration: const InputDecoration(hintText: 'Stream URL'),
-                keyboardType: TextInputType.url,
-                autocorrect: false,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context), // Close dialog without action
+                child: const Text('Cancel'),
               ),
-              TextField(
-                controller: imageUrlController,
-                decoration: const InputDecoration(hintText: 'Image URL'),
-                keyboardType: TextInputType.url,
-                autocorrect: false,
+              TextButton(
+                onPressed: () {
+                  // Validate and submit the form when the Add button is pressed
+                  setState(() {
+                    isNameValid = nameController.text.isNotEmpty;
+                    isLinkValid = linkController.text.isNotEmpty;
+                    isImageUrlValid = imageUrlController.text.isNotEmpty;
+                  });
+
+                  // Only proceed if all fields are valid
+                  if (isNameValid && isLinkValid && isImageUrlValid) {
+                    stations.add({
+                      'name': nameController.text,
+                      'link': linkController.text,
+                      'imageUrl': imageUrlController.text,
+                    });
+                    saveCustomStations(); // Save updated stations
+                    Navigator.pop(context); // Close dialog after adding the station
+                  }
+                },
+                child: const Text('Add'),
               ),
             ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context), // Close dialog without action
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  stations.add({
-                    'name': nameController.text,
-                    'link': linkController.text,
-                    'imageUrl': imageUrlController.text,
-                  }); // Dynamically add the station to `stations` and trigger UI update
-                  saveCustomStations(); // Save updated stations
-                });
-                Navigator.pop(context);
-              },
-              child: const Text('Add'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+          );
+        },
+      );
+    },
+  );
+}
 
 // TODO - Add Confirmation
   // Confirmation dialog to remove a station
@@ -615,7 +809,6 @@ void addCustomStation() {
       (PlayerState) {
           if (PlayerState.playing == true || PlayerState.processingState == ProcessingState.buffering || PlayerState.processingState == ProcessingState.loading) {
             // If nothing is playing, remove the stop button
-            print("-----PASS" + PlayerState.processingState.toString());
             setState(() {
               floatingStopButton = Container(
                 decoration: BoxDecoration(
@@ -660,11 +853,29 @@ void addCustomStation() {
         // fallback to "Open Android Radio" as station name, "No Data" as songTitle
         //
         // If there is no station name or title metadata available, fallback to "Open Android Radio" as station name, "No Data" as songTitle
-        if (metadata?.info?.title.toString().isEmpty == true && metadata?.headers?.name.toString().isEmpty == false) {
-          songTitle = metadata?.headers?.name.toString() ?? "No Data";
+
+        // Check if Player is Loading
+        if (player.playerState.playing == false && player.playerState.processingState == ProcessingState.loading || player.playerState.playing == false && player.playerState.processingState == ProcessingState.buffering) {
+          songTitle = metadata?.headers?.name.toString() ?? "Loading";
+          stationName = "Open Android Radio";
+          // Next Line: No Metadata at all will display unavailable message
+        } else if (metadata?.headers == null && metadata?.info == null) {
+          songTitle = "Metadata Unavailable";
+          stationName = "Open Android Radio";
+          // Next If: If song metadata is empty & station isn't, show just station name with OAR placeholder text.
+        } else if (metadata?.info?.title.toString().isEmpty == true && metadata?.headers?.name.toString().isEmpty == false) {
+          songTitle = metadata?.headers?.name.toString() ?? "Metadata Error";
+          stationName = "Open Android Radio";
+          // Next Line Checks if Track info is present but no station name is present
+        } else if (metadata?.info?.title.toString().isEmpty == false && metadata?.headers?.name.toString().isEmpty == true) {
+          songTitle = metadata?.info?.title.toString() ?? "Metadata Error";
+          stationName = "Open Android Radio";
+          // Next Line checks if the metadata is blank for both station & song names
+        } else if (metadata?.info?.title.toString().isEmpty == true && metadata?.headers?.name.toString().isEmpty == true) {
+          songTitle = "Metadata Unavailable";
           stationName = "Open Android Radio";
         } else {
-          songTitle = metadata?.info?.title.toString() ?? metadata?.headers?.name.toString() ?? "No Data";
+          songTitle = metadata?.info?.title.toString() ?? metadata?.headers?.name.toString() ?? "Metadata Error";
           stationName = metadata?.headers?.name.toString() ?? "Open Android Radio";
         }
 
@@ -715,11 +926,16 @@ void addCustomStation() {
           fontWeight: FontWeight.bold,
           fontSize: 18
           ),
-          actions: [
-          ],
+          // Debugging Code, Uncomment to print current icymetadata
+          // actions: [
+          //   IconButton(onPressed: () {
+          //     print("----- ICY Headers:  ${player.icyMetadata!.headers}");
+          //     print("----- ICY Info:  ${player.icyMetadata!.info}");
+          //   }, icon: Icon(Icons.print)),
+          // ],
       ),
 
-      body: StationList(stations: stations, player: player, removeStation: removeStation),
+      body: StationList(stations: stations, player: player, removeStation: removeStation,),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -733,48 +949,41 @@ void addCustomStation() {
                   ),
               ),
               child: Text(
-                'Open Android Radio \n(v0.0.5-beta)',
+                'Open Android Radio \n(v0.0.6-beta)',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
                 ),
               ),
             ),
-            // Button to add Custom Stations
+            // Button to allow the user to add Custom Stations
             ListTile(
               title: const Text('Add Station'),
               leading: const Icon(Icons.add),
               onTap: addCustomStation,
+            ),
+            // Opens the Import Type Selection Menu
+            ListTile(
+              title: const Text('Import Stations'),
+              leading: const Icon(Icons.import_export),
+              onTap: () => _importTypeSelection(context, stations),
             ),
             ListTile(
               title: const Text('Export Stations'),
               leading: const Icon(Icons.file_copy),
               onTap: exportStationsToClipboard,
             ),
-            ListTile(
-              title: const Text('Import Stations'),
-              leading: const Icon(Icons.import_export),
-              onTap: importStationsFromClipboard,
-            ),
-            // Option to Restore Stations from Default List
-            ListTile(
-              title: const Text('Online Preset'),
-              leading: const Icon(Icons.restore),
-              onTap: () => _showImportPresetsMenu(context),
-              ),
               // Opens the GitHub Repo
             ListTile(
               title: const Text('GitHub Repo'),
               leading: const Icon(Icons.code),
               onTap: () => launchUrlString("https://github.com/TypicalNerds/Open-Android-Radio"),
             ),
-            // TODO - Add a ToS To avoid getting sued by some dumbass
             ListTile(
               title: const Text('Terms of Use'),
               leading: const Icon(Icons.info),
               onTap: () => launchUrlString("https://github.com/TypicalNerds/Open-Android-Radio/blob/main/ToS.md"),
             ),
-            // TODO - Make Tutorials, Upload to YouTube Playlist and Link to it here
             ListTile(
               title: const Text('Help'),
               leading: const Icon(Icons.help_center),
