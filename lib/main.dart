@@ -282,6 +282,7 @@ void _showEditStationDialog(BuildContext context, Map<String, dynamic> station, 
 
   // Show the edit station dialog
   showDialog(
+    barrierDismissible: false,
     context: context,
     builder: (context) {
       return StatefulBuilder(
