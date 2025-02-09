@@ -24,13 +24,10 @@ By using this application, you agree to the following terms:
 6. **Prohibited Use**  
    Users must not use Open Android Radio for illegal purposes or to broadcast content that violates applicable laws or regulations.
 
-7. **Modifications to the App or Terms**  
-   Open Android Radio reserves the right to modify or discontinue the app at any time without prior notice. Users are however welcome to make their own modifications to the app and distribute it. However, users must not monetize their modified versions or reuse the name "Open Android Radio" for their distributions.
-
-8. **No Warranty or Support**  
+7. **No Warranty or Support**  
    Open Android Radio is provided "as is" without any warranties, express or implied. Technical support is not guaranteed and is provided at the sole discretion of the developers.
 
-9. **Tracking and User-Agent Information**  
+8. **Tracking and User-Agent Information**  
    Open Android Radio does not include built-in tracking features. However, other services, such as Google Play, may collect download statistics. Additionally, radio stations may be able to identify that the app being used to listen is Open Android Radio via the user-agent string.
 
 By using Open Android Radio, you acknowledge and agree to these terms.
