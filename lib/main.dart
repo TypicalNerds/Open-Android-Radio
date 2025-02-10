@@ -16,6 +16,7 @@ void main() async {
     androidNotificationChannelId: 'com.typicalnerds.open_android_radio.channel.audio',
     androidNotificationChannelName: 'Audio playback',
     androidNotificationOngoing: true,
+    androidNotificationIcon: "mipmap/ic_launcher_foreground",
   );
   runApp(const MyApp());
 }

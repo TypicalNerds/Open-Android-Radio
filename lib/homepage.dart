@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:open_android_radio/theme.dart'; // Import Themes & Styles File
 import 'station_list.dart';
 import 'dart:convert';
@@ -40,10 +41,7 @@ late Widget stopButtonReference = Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
-                    colors: [
-                    Colors.pink,
-                    Colors.deepPurple,
-                  ],
+                    colors: AppColors.gradientC,
                   begin: Alignment.topLeft,
                   end: Alignment.topRight,
                   ),
@@ -60,10 +58,7 @@ late Widget resumeButtonReference = Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
-                    colors: [
-                    Colors.blueAccent,
-                    Colors.deepPurple,
-                  ],
+                    colors: AppColors.gradientA,
                   begin: Alignment.topLeft,
                   end: Alignment.topRight,
                   ),
@@ -317,6 +312,10 @@ void addCustomStation() {
       bool isLinkValid = true;
       bool isImageUrlValid = true;
 
+      // Variables to Check Station Image Dropdown Selection
+      String? selectedImageUrl;
+      bool isCustomUrl = false;
+
       return StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
@@ -356,37 +355,81 @@ void addCustomStation() {
                     },
                   ),
                   SizedBox(height: 8),
-                  TextField(
-                    controller: imageUrlController,
-                    focusNode: imageUrlFocusNode,
-                    decoration: InputDecoration(
-                      hintText: 'Image URL',
-                      errorText: isImageUrlValid ? null : 'This field is required',
-                    ),
-                    keyboardType: TextInputType.url,
-                    autocorrect: false,
-                    textInputAction: TextInputAction.done, // "Done" action to complete the form
-                    onEditingComplete: () {
-                      // Trigger the Add button's action (or any other form submission action)
-                      setState(() {
-                        // Validation logic on form submission
-                        isNameValid = nameController.text.isNotEmpty;
-                        isLinkValid = linkController.text.isNotEmpty;
-                        isImageUrlValid = imageUrlController.text.isNotEmpty;
-                      });
+                  DropdownButtonFormField<String>(
+  value: selectedImageUrl,
+  decoration: InputDecoration(
+    labelText: 'Image Preset',
+  ),
+  items: [
+    DropdownMenuItem(value: 'assets/images/Generic-Red.png', child: Text('Generic Red'),),
+    DropdownMenuItem(value: 'assets/images/Generic-Orange.png', child: Text('Generic Orange')),
+    DropdownMenuItem(value: 'assets/images/Generic-Green.png', child: Text('Generic Green')),
+    DropdownMenuItem(value: 'assets/images/Generic-Teal.png', child: Text('Generic Teal')),
+    DropdownMenuItem(value: 'assets/images/Generic-Blue.png', child: Text('Generic Blue')),
+    DropdownMenuItem(value: 'assets/images/Generic-Purple.png', child: Text('Generic Purple')),
+    DropdownMenuItem(value: 'assets/images/Generic-Pink.png', child: Text('Generic Pink')),
+    DropdownMenuItem(value: 'custom', child: Text('--Custom URL--')),
+  ],
+  onChanged: (value) {
+    setState(() {
+      isCustomUrl = (value == 'custom');
+      selectedImageUrl = isCustomUrl ? null : value;
+      imageUrlController.text = isCustomUrl ? '' : value!;
+    });
+  },
+),
 
-                      // Only proceed if all fields are valid
-                      if (isNameValid && isLinkValid && isImageUrlValid) {
-                        stations.add({
-                          'name': nameController.text,
-                          'link': linkController.text,
-                          'imageUrl': imageUrlController.text,
-                        });
-                        saveCustomStations(); // Save updated stations
-                        Navigator.pop(context); // Close dialog after adding the station
-                      }
-                    },
-                  ),
+// Conditionally show TextField only if "Custom URL" is selected
+if (isCustomUrl)
+  TextField(
+    controller: imageUrlController,
+    focusNode: imageUrlFocusNode,
+    decoration: InputDecoration(
+      hintText: 'Enter Custom Image URL*',
+      errorText: isImageUrlValid ? null : 'This field is required',
+    ),
+    keyboardType: TextInputType.url,
+    autocorrect: false,
+    textInputAction: TextInputAction.done,
+    onEditingComplete: () {
+      setState(() {
+        isImageUrlValid = imageUrlController.text.isNotEmpty;
+      });
+    },
+  ),
+
+
+                  // TextField(
+                  //   controller: imageUrlController,
+                  //   focusNode: imageUrlFocusNode,
+                  //   decoration: InputDecoration(
+                  //     hintText: 'Image URL',
+                  //     errorText: isImageUrlValid ? null : 'This field is required',
+                  //   ),
+                  //   keyboardType: TextInputType.url,
+                  //   autocorrect: false,
+                  //   textInputAction: TextInputAction.done, // "Done" action to complete the form
+                  //   onEditingComplete: () {
+                  //     // Trigger the Add button's action (or any other form submission action)
+                  //     setState(() {
+                  //       // Validation logic on form submission
+                  //       isNameValid = nameController.text.isNotEmpty;
+                  //       isLinkValid = linkController.text.isNotEmpty;
+                  //       isImageUrlValid = imageUrlController.text.isNotEmpty;
+                  //     });
+
+                  //     // Only proceed if all fields are valid
+                  //     if (isNameValid && isLinkValid && isImageUrlValid) {
+                  //       stations.add({
+                  //         'name': nameController.text,
+                  //         'link': linkController.text,
+                  //         'imageUrl': imageUrlController.text,
+                  //       });
+                  //       saveCustomStations(); // Save updated stations
+                  //       Navigator.pop(context); // Close dialog after adding the station
+                  //     }
+                  //   },
+                  // ),
                 ],
               ),
             ),
@@ -510,17 +553,13 @@ void addCustomStation() {
           textAlign: TextAlign.left,
           pauseBetween: Duration(seconds: 0),
           velocity: const Velocity(pixelsPerSecond: Offset(20, 0)),
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            overflow: TextOverflow.visible,
-            ),
-            intervalSpaces: 15,
+          style: AppStyles.songTitleStyle,
+            intervalSpaces: 15,            
           );
           // Update stationNameScroll widget with new text and refresh formatting.
         stationNameScroll = TextScroll(
           stationName!,
-          style: const TextStyle(color: Colors.grey),
+          style: AppStyles.stationNameStyle,
           );          
       });
     });
@@ -535,7 +574,7 @@ void addCustomStation() {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-                  colors: [Colors.deepPurple, Colors.blue, ],
+                  colors: AppColors.gradientB,
                   transform: GradientRotation(1),
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -543,6 +582,7 @@ void addCustomStation() {
           ),
         ),
         // Title of the App
+        // TODO - Port to Themes.Dart
         title: Text(widget.title),
         titleTextStyle: const TextStyle(
           color: Colors.white,
@@ -551,7 +591,8 @@ void addCustomStation() {
           ),
           // Debugging Code, Uncomment to print current icymetadata
           actions: [
-            IconButton(onPressed: () {
+            // Debug Code for printing play stats
+            if (kDebugMode) IconButton(onPressed: () {
               print("----- ICY Headers:  ${player.icyMetadata!.headers}");
               print("----- ICY Info:  ${player.icyMetadata!.info}");
               print("----- Is Playing: ${player.playerState.playing}");
@@ -562,12 +603,12 @@ void addCustomStation() {
       ),
 
       body: RefreshIndicator(
-        child: StationList(stations: stations, player: player, removeStation: removeStation, onSave: saveCustomStations),
+        child: StationList(stations: stations, player: player, removeStation: removeStation,),
         // When a refresh is triggered, reload the stationlist.
         onRefresh: () => loadCustomStations(),
         semanticsLabel: "Refresh Station List",
         backgroundColor: Color(0xFF114770),
-        color: Color(0xfffFFFFFF),
+        color: Color(0xfffffffff),
 
 
 
@@ -577,18 +618,17 @@ void addCustomStation() {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            // TODO - Remove Old Code if Removed Const doesn't break everything
             // const DrawerHeader(
             DrawerHeader(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.blue, Colors.deepPurple,],
+                  colors: AppColors.gradientA,
                   begin: Alignment.bottomLeft,
                   end: Alignment.topRight,
                   ),
               ),
               child: Text(
-                'Open Android Radio \n(${Identifiers.appVersion}-beta)',
+                'Open Android Radio \n(v${Identifiers.appVersion}-beta)',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
@@ -619,14 +659,32 @@ void addCustomStation() {
               onTap: () => launchUrlString("https://github.com/TypicalNerds/Open-Android-Radio"),
             ),
             ListTile(
-              title: const Text('Terms of Use'),
-              leading: const Icon(Icons.info),
-              onTap: () => launchUrlString("https://github.com/TypicalNerds/Open-Android-Radio/blob/main/ToS.md"),
-            ),
-            ListTile(
               title: const Text('Help'),
               leading: const Icon(Icons.help_center),
               onTap: () => launchUrlString("https://youtube.com/playlist?list=PLFetoIJeQKyodXVrshz4SW8xuAvlEddf6"),
+            ),
+             ListTile(
+              title: const Text('About'),
+              leading: const Icon(Icons.info),
+              onTap: () => showAboutDialog(
+                context: context,
+                applicationName: "Open Android Radio",
+                applicationLegalese: "© Connor Spowart 2025",
+                applicationVersion: "v${Identifiers.appVersion}",
+                applicationIcon: ImageIcon(AssetImage("assets/icons/OAR-White.png")),
+                children: [
+                  ListTile(
+                    title: const Text('Terms of Use'),
+                    leading: const Icon(Icons.policy),
+                    onTap: () => launchUrlString("https://github.com/TypicalNerds/Open-Android-Radio/blob/main/ToS.md"),
+                  ),
+                  ListTile(
+                    title: const Text('App License'),
+                    leading: const Icon(Icons.info),
+                    onTap: () => launchUrlString("https://github.com/TypicalNerds/Open-Android-Radio/blob/main/LICENSE"),
+                  ),
+                ],                
+                ),
             ),
           ],
         ),

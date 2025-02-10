@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Used to Access the Clipboard to import/export stations
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart'; // Import service to enable background playback
+import 'package:open_android_radio/theme.dart';
 import 'package:text_scroll/text_scroll.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import Shared Preferences library to allow saving of stations
 
@@ -18,10 +19,9 @@ class StationList extends StatelessWidget {
   final List<Map<String, dynamic>> stations;
   final AudioPlayer player;
   final Function(int, BuildContext) removeStation;
-  final Function() onSave;
   
   // Create List of Stations
-  const StationList({super.key, required this.stations, required this.player, required this.removeStation, required this.onSave});
+  const StationList({super.key, required this.stations, required this.player, required this.removeStation,});
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -50,19 +50,27 @@ class StationList extends StatelessWidget {
                 titleAlignment: ListTileTitleAlignment.center,
                 
                 // Add in Radio Station Image
-                leading: station.containsKey('imageUrl')
-                    ? Image.network(
-                        station['imageUrl'],
-                        fit: BoxFit.contain,
-                        width: 80,
-                        height:50 ,
-                        semanticLabel: "${station['name']} logo",
-                        errorBuilder: (context, error, stackTrace) => const Icon(
-                          Icons.radio,
-                          size: 40,
-                        ),
-                      )
-                    : const Icon(Icons.radio, size: 40),
+                // If station image contains "http", assume it's a network image
+                leading: station.containsKey('imageUrl') && station['imageUrl'] != null
+                  ? station['imageUrl'].contains('http')
+                  ? Image.network(
+                    station['imageUrl'],
+                    fit: BoxFit.contain,
+                    width: 80,
+                    height: 50,
+                    semanticLabel: "${station['name']} logo",
+                    errorBuilder: (context, error, stackTrace) => AppStyles.errorIcon, // Assume Placeholder if it fails
+                  )
+                  // If it doesn't have HTTP, assume it's a local image asset
+                  : Image.asset(
+                    station['imageUrl'], // Assumes local asset path
+                    fit: BoxFit.contain,
+                    width: 80,
+                    height: 50,
+                    semanticLabel: "${station['name']} logo",
+                    errorBuilder: (context, error, stackTrace) => AppStyles.errorIcon, // Assume Placeholder Image if it fails to load
+                  )
+                  : AppStyles.errorIcon, // If it breaks, show a placeholder defined in the AppStyles
                     // Add Station Name
                 title: TextScroll(
                   station['name'],
@@ -135,10 +143,7 @@ class StationList extends StatelessWidget {
                   decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
-                    colors: [
-                    Colors.pink,
-                    Colors.deepPurple,
-                  ],
+                    colors: AppColors.gradientC,
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   ),
@@ -181,7 +186,7 @@ void _stationDropdown(BuildContext context, Map<String, dynamic> station, int in
               onTap: () {
                 Navigator.pop(context);
                 // Show the Edit Menu
-                _showEditStationDialog(context, station, index, onSave);
+                _showEditStationDialog(context, station, index);
               }
             ),
             // Remove Button
@@ -234,11 +239,10 @@ void _stationDropdown(BuildContext context, Map<String, dynamic> station, int in
   }
 }
 
-void _showEditStationDialog(BuildContext context, Map<String, dynamic> station, int index, Function onSave) {
+void _showEditStationDialog(BuildContext context, Map<String, dynamic> station, int index,) {
   final nameController = TextEditingController(text: station['name']);
   final linkController = TextEditingController(text: station['link']);
   final imageUrlController = TextEditingController(text: station['imageUrl']);
-  Function saveCustomStations = onSave;
 
   // FocusNodes to manage focus between fields
   final nameFocusNode = FocusNode();
@@ -313,6 +317,7 @@ void _showEditStationDialog(BuildContext context, Map<String, dynamic> station, 
                         isImageUrlValid = imageUrlController.text.isNotEmpty;
                       });
 
+                      // TODO - Potentially Saving When Edit Menu is closed unnecessarily
                       // Only proceed if all fields are valid
                       if (isNameValid && isLinkValid && isImageUrlValid) {
                         // Update the station in the list
@@ -321,19 +326,6 @@ void _showEditStationDialog(BuildContext context, Map<String, dynamic> station, 
                           'link': linkController.text,
                           'imageUrl': imageUrlController.text,
                         };
-
-                        // Save the updated list to SharedPreferences
-                        // SharedPreferences.getInstance().then((prefs) {
-                        //   final encodedStations = jsonEncode(stations);
-                        //   prefs.setString('customStations', encodedStations);
-                        //   // Trigger a rebuild by calling setState in the parent widget
-                        //   Navigator.pop(context); // Close the dialog
-                        // });
-                        // TODO - Somehow call the refresh function to reload station list
-                        // 
-                        // ;
-                        saveCustomStations;
-                        RefreshIndicatorState().widget;
                       }
                     },
                   ),
@@ -368,6 +360,9 @@ void _showEditStationDialog(BuildContext context, Map<String, dynamic> station, 
                       final encodedStations = jsonEncode(stations);
                       prefs.setString('customStations', encodedStations);
                       // Trigger a rebuild by calling setState in the parent widget
+                      ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Refresh Required to Show Changes")),
+                      );
                       Navigator.pop(context); // Close the dialog
 
                     });
