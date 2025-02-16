@@ -74,12 +74,7 @@ class StationList extends StatelessWidget {
                     // Add Station Name
                 title: TextScroll(
                   station['name'],
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                overflow: TextOverflow.visible,
-                ),
+                  style: AppStyles.labelLarge,
                   velocity: Velocity(pixelsPerSecond: Offset(10,0)),
                   fadedBorder: true,
               fadeBorderSide: FadeBorderSide.both,
@@ -97,6 +92,7 @@ class StationList extends StatelessWidget {
                   try {
                     if (player.playerState.playing == true) {
                       await player.stop();
+                      // TODO - Clear Player Cache when Stopped
                     }
                     // For some reason the stop command would sometimes get executed after stopping a station, hardcode a delay here to ensure it goes in the right order.
                     Future.delayed(Durations.medium2, () {
@@ -108,12 +104,12 @@ class StationList extends StatelessWidget {
                         id: "",
                         title: station['name'],
                         artist: "Open Android Radio",
-                        artUri: Uri.parse(station['imageUrl']),
+                        artUri: _getArtUri(station['imageUrl']), // Clean up the Art URI (check if local asset or web)
                         isLive: true,
                           ),
                         );
                       
-
+                    
                     player.setAudioSource(source);
                     player.play();
                     player.setLoopMode(LoopMode.one);
@@ -239,6 +235,7 @@ void _stationDropdown(BuildContext context, Map<String, dynamic> station, int in
   }
 }
 
+// Edit Station Menu
 void _showEditStationDialog(BuildContext context, Map<String, dynamic> station, int index,) {
   final nameController = TextEditingController(text: station['name']);
   final linkController = TextEditingController(text: station['link']);
@@ -376,4 +373,18 @@ void _showEditStationDialog(BuildContext context, Map<String, dynamic> station, 
       );
     },
   );
+}
+
+// Sanitise Art URI
+Uri _getArtUri(String? url) {
+  if (url == null || url.isEmpty) {
+    return Uri.parse("https://raw.githubusercontent.com/TypicalNerds/LakesideTV-Channel-Logos/refs/heads/main/Radio/Generic-OAR/Generic-Pink.png");
+  }
+
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return Uri.parse(url); // If already a valid HTTP URL, use it
+  }
+
+  // If the URL is an asset path, strip "assets/images/" and use GitHub raw URL
+  return Uri.parse("https://raw.githubusercontent.com/TypicalNerds/LakesideTV-Channel-Logos/refs/heads/main/Radio/Generic-OAR/${url.replaceFirst("assets/images/", "")}");
 }

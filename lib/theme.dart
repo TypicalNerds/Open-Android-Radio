@@ -48,12 +48,24 @@ class AppStyles {
     semanticLabel: "Station Logo",
   );
 
-  // All Text Themes Here
+  //------------------------------------------------------//
+  //--------------All Text Themes Below Here--------------//
+  //------------------------------------------------------//
+
   static const TextStyle titleLarge = TextStyle(color: Colors.white);
   static const TextStyle titleMedium = TextStyle(color: Colors.white);
   static const TextStyle titleSmall = TextStyle(color: Colors.white);
 
-  // Metadata Text Themes
+  // Label Styles
+  static const TextStyle labelSmall = TextStyle(color: Colors.white);
+  static const TextStyle labelMedium = TextStyle(color: Colors.white);
+  static const TextStyle labelLarge = TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700, );
+
+  // Display Styles
+
+  //
+
+  // Metadata Styles
   static const TextStyle songTitleStyle = TextStyle(fontSize: 18, fontWeight: FontWeight.w700, overflow: TextOverflow.visible);
   static const TextStyle stationNameStyle = TextStyle(color: Colors.grey);
 
@@ -71,5 +83,9 @@ ThemeData appTheme = ThemeData(
     titleMedium: AppStyles.titleMedium,
     titleSmall: AppStyles.titleSmall,
   ),
+
+  popupMenuTheme: PopupMenuThemeData(
+
+  )
         
   );

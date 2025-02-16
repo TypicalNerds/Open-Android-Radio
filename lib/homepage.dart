@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:open_android_radio/order_customiser.dart';
 import 'package:open_android_radio/theme.dart'; // Import Themes & Styles File
 import 'station_list.dart';
 import 'dart:convert';
@@ -17,13 +18,13 @@ class MyHomePage extends StatefulWidget {
   final String title;
   
   @override
-  State<MyHomePage> createState() => _MyHomePageState(); 
+  State<MyHomePage> createState() => MyHomePageState(); 
 }
 
 // This is the main part of the homepage
-class _MyHomePageState extends State<MyHomePage> {
+class MyHomePageState extends State<MyHomePage> {
   // Initalise Just Audio
-  final player = AudioPlayer(
+  late var player = AudioPlayer(
       userAgent: Identifiers().getUserAgent(), // Define the User Agent Here
   useProxyForRequestHeaders: true, // default
 );
@@ -268,20 +269,20 @@ Future<void> _importDefaultStationsFromWeb(BuildContext context, String url) asy
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Failed to import stations.")),
-    );
-  }
+      );
+    }
 }
 
-// Function to save stations
-Future<void> saveCustomStations() async {
+  // Function to save stations
+  Future<void> saveCustomStations() async {
     final prefs = await SharedPreferences.getInstance();
     final encodedStations = jsonEncode(stations);
     await prefs.setString('customStations', encodedStations);
     loadCustomStations();
   }
 
-// Function used to load saved stations
-Future<void> loadCustomStations() async {
+  // Function used to load saved stations
+  Future<void> loadCustomStations() async {
     final prefs = await SharedPreferences.getInstance();
     final encodedStations = prefs.getString('customStations');
     if (encodedStations != null) {
@@ -356,80 +357,45 @@ void addCustomStation() {
                   ),
                   SizedBox(height: 8),
                   DropdownButtonFormField<String>(
-  value: selectedImageUrl,
-  decoration: InputDecoration(
-    labelText: 'Image Preset',
-  ),
-  items: [
-    DropdownMenuItem(value: 'assets/images/Generic-Red.png', child: Text('Generic Red'),),
-    DropdownMenuItem(value: 'assets/images/Generic-Orange.png', child: Text('Generic Orange')),
-    DropdownMenuItem(value: 'assets/images/Generic-Green.png', child: Text('Generic Green')),
-    DropdownMenuItem(value: 'assets/images/Generic-Teal.png', child: Text('Generic Teal')),
-    DropdownMenuItem(value: 'assets/images/Generic-Blue.png', child: Text('Generic Blue')),
-    DropdownMenuItem(value: 'assets/images/Generic-Purple.png', child: Text('Generic Purple')),
-    DropdownMenuItem(value: 'assets/images/Generic-Pink.png', child: Text('Generic Pink')),
-    DropdownMenuItem(value: 'custom', child: Text('--Custom URL--')),
-  ],
-  onChanged: (value) {
-    setState(() {
-      isCustomUrl = (value == 'custom');
-      selectedImageUrl = isCustomUrl ? null : value;
-      imageUrlController.text = isCustomUrl ? '' : value!;
-    });
-  },
-),
-
-// Conditionally show TextField only if "Custom URL" is selected
-if (isCustomUrl)
-  TextField(
-    controller: imageUrlController,
-    focusNode: imageUrlFocusNode,
-    decoration: InputDecoration(
-      hintText: 'Enter Custom Image URL*',
-      errorText: isImageUrlValid ? null : 'This field is required',
-    ),
-    keyboardType: TextInputType.url,
-    autocorrect: false,
-    textInputAction: TextInputAction.done,
-    onEditingComplete: () {
-      setState(() {
-        isImageUrlValid = imageUrlController.text.isNotEmpty;
-      });
-    },
-  ),
-
-
-                  // TextField(
-                  //   controller: imageUrlController,
-                  //   focusNode: imageUrlFocusNode,
-                  //   decoration: InputDecoration(
-                  //     hintText: 'Image URL',
-                  //     errorText: isImageUrlValid ? null : 'This field is required',
-                  //   ),
-                  //   keyboardType: TextInputType.url,
-                  //   autocorrect: false,
-                  //   textInputAction: TextInputAction.done, // "Done" action to complete the form
-                  //   onEditingComplete: () {
-                  //     // Trigger the Add button's action (or any other form submission action)
-                  //     setState(() {
-                  //       // Validation logic on form submission
-                  //       isNameValid = nameController.text.isNotEmpty;
-                  //       isLinkValid = linkController.text.isNotEmpty;
-                  //       isImageUrlValid = imageUrlController.text.isNotEmpty;
-                  //     });
-
-                  //     // Only proceed if all fields are valid
-                  //     if (isNameValid && isLinkValid && isImageUrlValid) {
-                  //       stations.add({
-                  //         'name': nameController.text,
-                  //         'link': linkController.text,
-                  //         'imageUrl': imageUrlController.text,
-                  //       });
-                  //       saveCustomStations(); // Save updated stations
-                  //       Navigator.pop(context); // Close dialog after adding the station
-                  //     }
-                  //   },
-                  // ),
+                    value: selectedImageUrl,
+                    decoration: InputDecoration(
+                      labelText: 'Image Preset',
+                    ),
+                    items: [
+                      DropdownMenuItem(value: 'assets/images/Generic-Red.png', child: Text('Generic Red'),),
+                      DropdownMenuItem(value: 'assets/images/Generic-Orange.png', child: Text('Generic Orange')),
+                      DropdownMenuItem(value: 'assets/images/Generic-Green.png', child: Text('Generic Green')),
+                      DropdownMenuItem(value: 'assets/images/Generic-Teal.png', child: Text('Generic Teal')),
+                      DropdownMenuItem(value: 'assets/images/Generic-Blue.png', child: Text('Generic Blue')),
+                      DropdownMenuItem(value: 'assets/images/Generic-Purple.png', child: Text('Generic Purple')),
+                      DropdownMenuItem(value: 'assets/images/Generic-Pink.png', child: Text('Generic Pink')),
+                      DropdownMenuItem(value: 'custom', child: Text('--Custom URL--')),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        isCustomUrl = (value == 'custom');
+                        selectedImageUrl = isCustomUrl ? null : value;
+                        imageUrlController.text = isCustomUrl ? '' : value!;
+                      });
+                    },
+                  ),
+                  // Conditionally show TextField only if "Custom URL" is selected
+                  if (isCustomUrl) TextField(
+                    controller: imageUrlController,
+                    focusNode: imageUrlFocusNode,
+                    decoration: InputDecoration(
+                      hintText: 'Enter Custom Image URL*',
+                      errorText: isImageUrlValid ? null : 'This field is required',
+                    ),
+                    keyboardType: TextInputType.url,
+                    autocorrect: false,
+                    textInputAction: TextInputAction.done,
+                    onEditingComplete: () {
+                      setState(() {
+                        isImageUrlValid = imageUrlController.text.isNotEmpty;
+                      });
+                    },
+                  ),
                 ],
               ),
             ),
@@ -477,7 +443,10 @@ if (isCustomUrl)
                 });
   }
 
+
   @override
+
+
   void initState() {
     super.initState();
     loadCustomStations();    
@@ -589,7 +558,6 @@ if (isCustomUrl)
           fontWeight: FontWeight.bold,
           fontSize: 18
           ),
-          // Debugging Code, Uncomment to print current icymetadata
           actions: [
             // Debug Code for printing play stats
             if (kDebugMode) IconButton(onPressed: () {
@@ -599,6 +567,21 @@ if (isCustomUrl)
               print("----- Processing State: ${player.playerState.processingState}");
               print("---------------------------------------------------");
             }, icon: Icon(Icons.print)),
+
+            IconButton(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChangeOrder(stations: stations),
+                )).then(
+                  (value) {
+                    loadCustomStations();
+                  },
+                ),
+
+              icon: Icon(Icons.sort, semanticLabel: "Change Station Order",),
+              ),
+
           ],
       ),
 
@@ -642,26 +625,23 @@ if (isCustomUrl)
               onTap: addCustomStation,
             ),
             // Opens the Import Type Selection Menu
+            // TODO - Read Import From File
             ListTile(
               title: const Text('Import Stations'),
               leading: const Icon(Icons.import_export),
               onTap: () => _importTypeSelection(context, stations),
             ),
+            // Open the Menu to Export Stations
+            // TODO - Allow Saving to File
             ListTile(
               title: const Text('Export Stations'),
               leading: const Icon(Icons.file_copy),
               onTap: exportStationsToClipboard,
             ),
-              // Opens the GitHub Repo
-            ListTile(
-              title: const Text('GitHub Repo'),
-              leading: const Icon(Icons.code),
-              onTap: () => launchUrlString("https://github.com/TypicalNerds/Open-Android-Radio"),
-            ),
             ListTile(
               title: const Text('Help'),
               leading: const Icon(Icons.help_center),
-              onTap: () => launchUrlString("https://youtube.com/playlist?list=PLFetoIJeQKyodXVrshz4SW8xuAvlEddf6"),
+              onTap: () => launchUrlString("https://youtube.com/playlist?list=PLe0JzvhPgFQM05YIcxX8UhG5F-6qkZ4O9"), // Open The Tutorials from YouTube
             ),
              ListTile(
               title: const Text('About'),
@@ -671,17 +651,21 @@ if (isCustomUrl)
                 applicationName: "Open Android Radio",
                 applicationLegalese: "© Connor Spowart 2025",
                 applicationVersion: "v${Identifiers.appVersion}",
-                applicationIcon: ImageIcon(AssetImage("assets/icons/OAR-White.png")),
                 children: [
+                  ListTile(
+                    title: const Text('GitHub Repo'),
+                    leading: const Icon(Icons.code),
+                    onTap: () => launchUrlString("https://github.com/TypicalNerds/Open-Android-Radio"), // Open The GitHub Repo
+                  ),
                   ListTile(
                     title: const Text('Terms of Use'),
                     leading: const Icon(Icons.policy),
-                    onTap: () => launchUrlString("https://github.com/TypicalNerds/Open-Android-Radio/blob/main/ToS.md"),
+                    onTap: () => launchUrlString("https://github.com/TypicalNerds/Open-Android-Radio/blob/main/ToS.md"), // Open The Terms of Service
                   ),
                   ListTile(
                     title: const Text('App License'),
                     leading: const Icon(Icons.info),
-                    onTap: () => launchUrlString("https://github.com/TypicalNerds/Open-Android-Radio/blob/main/LICENSE"),
+                    onTap: () => launchUrlString("https://github.com/TypicalNerds/Open-Android-Radio/blob/main/LICENSE"), // Open The License Details
                   ),
                 ],                
                 ),
@@ -707,13 +691,13 @@ if (isCustomUrl)
                     stationNameScroll,
                   ],
                 ),
+              ),
+            ],
+          ),
         ),
-      ],
-    ),
-  ),
-),
-floatingActionButton: floatingButton,
-floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,
+      ),
+      floatingActionButton: floatingButton,
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,
     );
   }
 }

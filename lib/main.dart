@@ -17,6 +17,7 @@ void main() async {
     androidNotificationChannelName: 'Audio playback',
     androidNotificationOngoing: true,
     androidNotificationIcon: "mipmap/ic_launcher_foreground",
+    androidStopForegroundOnPause: true,
   );
   runApp(const MyApp());
 }
