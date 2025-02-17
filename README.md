@@ -3,7 +3,8 @@ Open Android Radio is an experimental project intended as a internet radio clien
 
 # Features
 - Add/Remove Radio Stations
-- Background Playback (starting from v0.0.4-beta)
+- Background Playback (v0.0.4-beta & above)
+- Change Station Order (v0.0.7-beta & above)
 - Edit Stations after adding
 - Listen to Radio Stations with Ease
 - Simple Clean UI
@@ -14,7 +15,6 @@ Open Android Radio is an experimental project intended as a internet radio clien
  
 # Planned Features
 - Categories/Genres
-- Change Station Order
 - Localisation (Multi-Language Support)
 - Recovery from errors
 - Station Favourites
