@@ -1,3 +1,10 @@
+[![Badge Framework]](https://flutter.dev/)
+[![Badge License]](https://github.com/TypicalNerds/Open-Android-Radio/blob/main/LICENSE)
+[![Badge OS]](https://www.android.com/)
+[![Badge Website]](https://typicalnerds.uk/projects/radio/)
+
+***
+
 # What is Open Android Radio?
 Open Android Radio is an experimental project intended as a internet radio client for mobile devices.
 
@@ -19,6 +26,7 @@ Open Android Radio is an experimental project intended as a internet radio clien
 - Recovery from errors
 - Station Favourites
 
+***
 
 # FAQ
 ## Are Stations Included?
@@ -44,3 +52,8 @@ I won't be adding any trackers or advertisements either, but keep in mind that t
 ## How is this tested?
 It is being tested on both my Samsung Galaxy S24 and a Android Emulator running similar firmware as a Google Pixel.
 
+<!----------------------------------[ Badges ]--------------------------------->
+[Badge Framework]: https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white
+[Badge License]: https://img.shields.io/badge/AGPL--3.0-red?style=for-the-badge
+[Badge OS]: https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white
+[Badge Website]: https://img.shields.io/badge/website-000000?style=for-the-badge&logoColor=white
