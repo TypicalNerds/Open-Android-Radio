@@ -32,6 +32,6 @@ By using this application, you agree to the following terms:
 
 By using Open Android Radio, you acknowledge and agree to these terms.
 
-If you have any questions or concerns, please contact me via email: [connorspowart@hotmail.co.uk](mailto:connorspowart@hotmail.co.uk).
+If you have any questions or concerns, please contact me via email: [contact@typicalnerds.uk](mailto:contact@typicalnerds.uk).
 
 
