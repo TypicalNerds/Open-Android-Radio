@@ -81,6 +81,11 @@ void _importTypeSelection(BuildContext context, List<Map<String, dynamic>> stati
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            ListTile(
+              title: const Text('Custom Station'),
+              leading: const Icon(Icons.add),
+              onTap: addCustomStation,
+            ),
             // Import from Device Clipboard
             ListTile(
               leading: Icon(Icons.paste),
@@ -158,7 +163,7 @@ void _importTypeSelection(BuildContext context, List<Map<String, dynamic>> stati
 void _showGitHubImportPresetsMenu() async {
   // Specify the URL for grabbing the presets
   const presetsConfigUrl =
-      'https://raw.githubusercontent.com/TypicalNerds/OAR-Presets/refs/heads/main/preset-config.json';
+      'https://typicalnerds.uk/OAR-Presets/preset-config.json';
 
   try {
     // Fetch the presets configuration file
@@ -619,15 +624,15 @@ void addCustomStation() {
               ),
             ),
             // Button to allow the user to add Custom Stations
-            ListTile(
-              title: const Text('Add Station'),
-              leading: const Icon(Icons.add),
-              onTap: addCustomStation,
-            ),
+            // ListTile(
+            //   title: const Text('Add Station'),
+            //   leading: const Icon(Icons.add),
+            //   onTap: addCustomStation,
+            // ),
             // Opens the Import Type Selection Menu
             // TODO - Read Import From File
             ListTile(
-              title: const Text('Import Stations'),
+              title: const Text('Add Stations'),
               leading: const Icon(Icons.import_export),
               onTap: () => _importTypeSelection(context, stations),
             ),

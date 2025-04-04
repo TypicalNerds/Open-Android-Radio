@@ -53,6 +53,7 @@ I won't be adding any trackers or advertisements either, but keep in mind that t
 It is being tested on both my Samsung Galaxy S24 and a Android Emulator running similar firmware as a Google Pixel.
 
 <!----------------------------------[ Badges ]--------------------------------->
+
 [Badge Framework]: https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white
 [Badge License]: https://img.shields.io/badge/AGPL--3.0-red?style=for-the-badge
 [Badge OS]: https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white
