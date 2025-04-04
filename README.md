@@ -30,7 +30,11 @@ Open Android Radio is an experimental project intended as a internet radio clien
 
 # FAQ
 ## Are Stations Included?
-As of Writing, no stations are included with the presets until I have gotten permission from radio station operators as they own the trademarks and copyrights for logos and names, requiring me to obtain their permission first, at the moment I am working on gathering permission from some large media organisations to get permission to include major UK Radio stations as standard but I cannot gaurentee anything at this time.
+As of Writing, a limited number of stations from the broadcasters listed below are available and are licensed appropriately, if you wish to request your station be added to our presets, contact me at [radio@typicalnerds.uk](mailto:radio@typicalnerds.uk)
+
+- Nation Broadcasting - Nation Radio & Sister Stations
+
+Last Updated: 04/04/2025
 
 For More Info, view the ReadMe over on the [OAR-Presets Repo](https://github.com/TypicalNerds/OAR-Presets).
 
