@@ -1,5 +1,6 @@
 [![Badge Framework]](https://flutter.dev/)
 [![Badge License]](https://github.com/TypicalNerds/Open-Android-Radio/blob/main/LICENSE)
+[![Badge PlayStore]](https://play.google.com/store/apps/details?id=com.typicalnerds.open_android_radio)
 [![Badge OS]](https://www.android.com/)
 [![Badge Website]](https://typicalnerds.uk/projects/radio/)
 
@@ -62,3 +63,4 @@ It is being tested on both my Samsung Galaxy S24 and a Android Emulator running 
 [Badge License]: https://img.shields.io/badge/AGPL--3.0-red?style=for-the-badge
 [Badge OS]: https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white
 [Badge Website]: https://img.shields.io/badge/website-000000?style=for-the-badge&logoColor=white
+[Badge PlayStore]: https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=green
