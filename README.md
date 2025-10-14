@@ -31,7 +31,7 @@ Open Android Radio is an experimental project intended as a internet radio clien
 
 # FAQ
 ## Are Stations Included?
-As of Writing, a limited number of stations from the broadcasters listed below are available and are licensed appropriately, if you wish to request your station be added to our presets, contact me at [radio@typicalnerds.uk](mailto:radio@typicalnerds.uk)
+As of Writing, a limited number of stations from the broadcasters listed below are available and are licensed appropriately, if you wish to request your station be added to our presets, contact me at [contact@typicalnerds.uk](mailto:contact@typicalnerds.uk)
 
 - Nation Broadcasting - Nation Radio & Sister Stations
 
