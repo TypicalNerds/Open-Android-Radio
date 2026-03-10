@@ -163,7 +163,7 @@ void _importTypeSelection(BuildContext context, List<Map<String, dynamic>> stati
 void _showGitHubImportPresetsMenu() async {
   // Specify the URL for grabbing the presets
   const presetsConfigUrl =
-      'https://api.typicalnerds.uk/OAR/preset-config.json';
+      'https://api.typicalnerds.uk/oar/preset-config.json';
 
   try {
     // Fetch the presets configuration file
