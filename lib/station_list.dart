@@ -378,7 +378,7 @@ void _showEditStationDialog(BuildContext context, Map<String, dynamic> station, 
 // Sanitise Art URI
 Uri _getArtUri(String? url) {
   if (url == null || url.isEmpty) {
-    return Uri.parse("https://raw.githubusercontent.com/TypicalNerds/LakesideTV-Channel-Logos/refs/heads/main/Radio/Generic-OAR/Generic-Pink.png");
+    return Uri.parse("https://typicalnerds.uk/LakesideTV-Channel-Logos/Radio/Generic-OAR/Generic-Pink.png");
   }
 
   if (url.startsWith('http://') || url.startsWith('https://')) {
@@ -386,5 +386,5 @@ Uri _getArtUri(String? url) {
   }
 
   // If the URL is an asset path, strip "assets/images/" and use GitHub raw URL
-  return Uri.parse("https://raw.githubusercontent.com/TypicalNerds/LakesideTV-Channel-Logos/refs/heads/main/Radio/Generic-OAR/${url.replaceFirst("assets/images/", "")}");
+  return Uri.parse("https://typicalnerds.uk/LakesideTV-Channel-Logos/Radio/Generic-OAR/${url.replaceFirst("assets/images/", "")}");
 }
