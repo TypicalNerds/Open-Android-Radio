@@ -3,7 +3,7 @@ import 'dart:io';
 
 // Identifiers used to get app version and user agents are located here
 class Identifiers {
-  static String appVersion = "0.0.7"; // App Version Number
+  static String appVersion = "0.0.8"; // App Version Number
 
   String getUserAgent() {
     if (Platform.isAndroid) {
