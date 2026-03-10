@@ -654,7 +654,7 @@ void addCustomStation() {
               onTap: () => showAboutDialog(
                 context: context,
                 applicationName: "Open Android Radio",
-                applicationLegalese: "© Connor Spowart 2025",
+                applicationLegalese: "Developed by:\nTypical Nerds",
                 applicationVersion: "v${Identifiers.appVersion}",
                 children: [
                   ListTile(
