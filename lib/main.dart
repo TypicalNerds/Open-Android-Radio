@@ -35,4 +35,3 @@ class MyApp extends StatelessWidget {
 }
 
 // © Connor Spowart 2024-2025
-// DEVELOPMENT BUILD: NOT SUITABLE FOR PRODUCTION
