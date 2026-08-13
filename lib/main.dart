@@ -34,4 +34,4 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// © Connor Spowart 2024-2025
+// Developed by https://typicalnerds.uk

@@ -643,11 +643,12 @@ void addCustomStation() {
               leading: const Icon(Icons.file_copy),
               onTap: exportStationsToClipboard,
             ),
-            // ListTile(
-            //   title: const Text('Help'),
-            //   leading: const Icon(Icons.help_center),
-            //   onTap: () => launchUrlString("https://youtube.com/playlist?list=PLe0JzvhPgFQM05YIcxX8UhG5F-6qkZ4O9"), // Open The Tutorials from YouTube
-            // ),
+            ListTile(
+              title: const Text('Report Bug'),
+              leading: const Icon(Icons.bug_report),
+              onTap: () => launchUrlString("https://github.com/TypicalNerds/Open-Android-Radio/issues"), // Open The GitHub Issues Page
+            ),
+
              ListTile(
               title: const Text('About'),
               leading: const Icon(Icons.info),
